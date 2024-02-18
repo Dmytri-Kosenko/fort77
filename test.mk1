@@ -1,0 +1,22 @@
+!define BLANK ""
+"C:\Users\dmitr\OneDrive\Desktop\Документы\pv\testcode.obj" : "C:\Users\dmit&
+r\OneDrive\Desktop\Документы\pv\testcode.for" .AUTODEPEND
+ @C:
+ cd C:\Users\dmitr\OneDrive\Desktop\Документы\pv
+ wfc386 testcode.for -d2 -q -dep
+
+"C:\Users\dmitr\OneDrive\Desktop\Документы\pv\test.exe" : "C:\Users\dmitr\On&
+eDrive\Desktop\Документы\pv\testcode.obj" .AUTODEPEND
+ @C:
+ cd C:\Users\dmitr\OneDrive\Desktop\Документы\pv
+ @%write test.lk1 FIL testcode.obj
+ @%append test.lk1 
+!ifneq BLANK ""
+ *wlib -q -n -b test.imp 
+ @%append test.lk1 LIBR test.imp
+!endif
+!ifneq BLANK ""
+ @%append test.lk1 
+!endif
+ *wlink name test d all sys nt op m op maxe=25 op q op symf @test.lk1
+
