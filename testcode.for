@@ -5,11 +5,11 @@
       
       subroutine menu()
       implicit none
+      real a, alpha, beta, gamma, triangleArea, mina, minc
+      common /triangle/a, alpha, beta, gamma,
+     &triangleArea/angles/mina,minc
       integer c
-      double precision alpha,beta,a,minangle,mincos
-      alpha = -1
-      beta = alpha
-      a = alpha
+      call input
    99 print ('(a)'), 'Menu', '1)Entering values of triangle',
      &'2)Calculating the area of a triangle',
      &'3)Calculation of the minimum angle in degrees',
@@ -17,41 +17,75 @@
      &'5)Exit'
       read *,c
       goto (1,2,3,4,5), c
-    1 call input(a,alpha,beta)
+    1 call input
       goto 99
-    2 write(*,*) a, alpha,beta
+    2 call AreaOfTriangle
+      print *,'Triangle area: ', triangleArea
       goto 99
-    3 print *,'Minimum angle: ',minAngle(alpha,beta)
+    3 call minAngle
+      print *,'Minimum angle: ',mina
       goto 99
-    4 print *,'Cos of minimum angle: ', minCos(minAngle(alpha,beta))
+    4 call minCos
+      print *,'Cos of minimum angle: ', minc
       goto 99
     5 stop
       end
  
-      subroutine input(a, alpha, beta)
+      subroutine input
       implicit none
-      double precision a, alpha, beta
+      real a, alpha, beta, gamma, triangleArea, mina, minc 
+      common /triangle/a, alpha, beta, gamma, triangleArea
+      common /angles/mina, minc
+      logical isTriangle
       print *,'Enter new values for the characteristics '
      &'of the triangle (side, angles):'
       read *,a, alpha, beta
+      gamma = 180 - alpha - beta
+      if(.not. isTriangle(a,alpha,beta, gamma)) then
+        call input
+      endif
       end
       
-      double precision function minAngle(alpha, beta)
+      subroutine minAngle
       implicit none
-      double precision alpha, beta, min
-      if(alpha .le. beta) then
-        min = alpha
+      common /triangle/a, alpha, beta, gamma, triangleArea
+      common /angles/mina, minc
+      real a, alpha, beta, gamma, triangleArea, mina, minc
+      mina = min(alpha, beta, gamma)
+      end
+      
+      subroutine minCos
+      implicit none
+      real a, alpha, beta, gamma, triangleArea, mina, minc
+      common /triangle/a, alpha, beta, gamma, triangleArea
+      common /angles/mina, minc
+      real pi
+      pi = 3.1415
+      call minAngle(alpha,beta,gamma)
+      minc = cos(mina * pi/180)
+      end
+      
+      subroutine AreaOfTriangle
+      implicit none
+      real a, alpha, beta, gamma, triangleArea
+      common /triangle/a, alpha, beta, gamma, triangleArea
+      real pi
+      pi = 3.1415
+      triangleArea = a**2/(2*(1/tan(alpha*pi/180) + 
+     &1/tan(beta*pi/180)) )
+      end
+      
+      logical function isTriangle(a,alpha,beta, gamma)
+      implicit none
+      real a,alpha,beta,gamma
+      if(alpha + beta .ge. 180 )then
+        print *,'The sum of the angles exceeds 180'
+        isTriangle = .false.
+      else if( alpha .le. 0 .or.
+     &beta .le. 0 .or. a .le. 0)then
+        print *,'incorrect input'
+        isTriangle = .false.
       else
-        min = beta
+        isTriangle = .true.
       endif
-      if(min .ge. (180 - (alpha + beta))) then
-        min = 180 - (alpha + beta)
-      endif
-      minAngle = min
-      end
-      
-      double precision function minCos(angle)
-      implicit none
-      double precision angle
-      minCos = cos(angle)
       end
